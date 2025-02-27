@@ -1,8 +1,9 @@
 import { DndContext, Modifier, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { PropsWithChildren } from "react";
+import {PropsWithChildren, useCallback} from "react";
 import { CellSize, DAY_LABELS } from "./constants.ts";
 import { useScheduleContext } from "./ScheduleContext.tsx";
 
+// 드래그되는 항목이 그리드에 맞춰 스냅되도록 하는 modifier 생성
 function createSnapModifier(): Modifier {
   return ({ transform, containerNodeRect, draggingNodeRect }) => {
     const containerTop = containerNodeRect?.top ?? 0;
@@ -30,6 +31,8 @@ const modifiers = [createSnapModifier()]
 
 export default function ScheduleDndProvider({ children }: PropsWithChildren) {
   const { schedulesMap, setSchedulesMap } = useScheduleContext();
+
+  // 드래그 동작 감지
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -38,8 +41,9 @@ export default function ScheduleDndProvider({ children }: PropsWithChildren) {
     })
   );
 
+  // 드래그가 끝났을 때 호출
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = useCallback((event: any) => {
     const { active, delta } = event;
     const { x, y } = delta;
     const [tableId, index] = active.id.split(':');
@@ -61,7 +65,7 @@ export default function ScheduleDndProvider({ children }: PropsWithChildren) {
         }
       })
     })
-  };
+  }, [schedulesMap, setSchedulesMap]);
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd} modifiers={modifiers}>

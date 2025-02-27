@@ -2,31 +2,46 @@ import { Button, ButtonGroup, Flex, Heading, Stack } from "@chakra-ui/react";
 import ScheduleTable from "./ScheduleTable.tsx";
 import { useScheduleContext } from "./ScheduleContext.tsx";
 import SearchDialog from "./SearchDialog.tsx";
-import { useState } from "react";
+import {useCallback, useMemo, useState} from "react";
 
-export const ScheduleTables = () => {
-  const { schedulesMap, setSchedulesMap } = useScheduleContext();
-  const [searchInfo, setSearchInfo] = useState<{
+export interface SearchInfo {
     tableId: string;
     day?: string;
     time?: number;
-  } | null>(null);
+}
 
-  const disabledRemoveButton = Object.keys(schedulesMap).length === 1;
+export const ScheduleTables = () => {
+  const { schedulesMap, setSchedulesMap } = useScheduleContext();
+  const [searchInfo, setSearchInfo] = useState<SearchInfo | null>(null);
 
-  const duplicate = (targetId: string) => {
+  const disabledRemoveButton = useMemo(() => Object.keys(schedulesMap).length === 1, [schedulesMap]);
+
+  const duplicate = useCallback((targetId: string) => {
     setSchedulesMap(prev => ({
       ...prev,
       [`schedule-${Date.now()}`]: [...prev[targetId]]
     }))
-  };
+  }, [setSchedulesMap]);
 
-  const remove = (targetId: string) => {
+  const remove = useCallback((targetId: string) => {
     setSchedulesMap(prev => {
       delete prev[targetId];
       return { ...prev };
     })
-  };
+  }, [setSchedulesMap]);
+
+  const handleScheduleTimeClick = useCallback(({tableId, day, time}: SearchInfo) => {
+    setSearchInfo({ tableId, day, time });
+  }, []);
+
+  const handleScheduleDelete = useCallback(({tableId, day, time}: SearchInfo) => {
+    if (!day || !time) return;
+
+    setSchedulesMap((prev) => ({
+      ...prev,
+      [tableId]: prev[tableId].filter(schedule => schedule.day !== day || !schedule.range.includes(time))
+    }))
+  },[setSchedulesMap]);
 
   return (
     <>
@@ -46,11 +61,8 @@ export const ScheduleTables = () => {
               key={`schedule-table-${index}`}
               schedules={schedules}
               tableId={tableId}
-              onScheduleTimeClick={(timeInfo) => setSearchInfo({ tableId, ...timeInfo })}
-              onDeleteButtonClick={({ day, time }) => setSchedulesMap((prev) => ({
-                ...prev,
-                [tableId]: prev[tableId].filter(schedule => schedule.day !== day || !schedule.range.includes(time))
-              }))}
+              onScheduleTimeClick={handleScheduleTimeClick}
+              onDeleteButtonClick={handleScheduleDelete}
             />
           </Stack>
         ))}
