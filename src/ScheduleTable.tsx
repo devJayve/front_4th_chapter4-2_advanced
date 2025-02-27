@@ -20,12 +20,10 @@ import {CSS} from "@dnd-kit/utilities";
 import {ComponentProps, Fragment, memo, useCallback} from "react";
 import {SearchInfo} from "./ScheduleTables.tsx";
 import DragContainer from "./DragContainer.tsx";
+import {useScheduleContext} from "./provider/ScheduleProvider.tsx";
 
 interface Props {
-    tableId: string;
-    schedules: Schedule[];
     onScheduleTimeClick: (searchInfo: SearchInfo) => void;
-    onDeleteButtonClick: (searchInfo: SearchInfo) => void;
 }
 
 const TIMES = [
@@ -40,15 +38,14 @@ const TIMES = [
         .map((v) => `${parseHnM(v)}~${parseHnM(v + 50 * 분)}`),
 ] as const;
 
-const ScheduleTable = memo(({tableId, schedules, onScheduleTimeClick, onDeleteButtonClick}: Props) => {
+const ScheduleTable = memo(({onScheduleTimeClick}: Props) => {
+    const {tableId, schedules, removeSchedule} = useScheduleContext();
 
     const getColor = useCallback((lectureId: string): string => {
         const lectures = [...new Set(schedules.map(({lecture}) => lecture.id))];
         const colors = ["#fdd", "#ffd", "#dff", "#ddf", "#fdf", "#dfd"];
         return colors[lectures.indexOf(lectureId) % colors.length];
     }, [schedules]);
-    //
-
 
     return (
         <DragContainer tableId={tableId}>
@@ -102,15 +99,10 @@ const ScheduleTable = memo(({tableId, schedules, onScheduleTimeClick, onDeleteBu
             {schedules.map((schedule, index) => (
                 <DraggableSchedule
                     key={`${schedule.lecture.title}-${index}`}
-                    id={`${tableId}:${index}`}
+                    id={`${index}`}
                     data={schedule}
                     bg={getColor(schedule.lecture.id)}
-                    onDeleteButtonClick={() => onDeleteButtonClick({
-                            tableId,
-                            day: schedule.day,
-                            time: schedule.range[0],
-                        }
-                    )}
+                    onDeleteButtonClick={() => removeSchedule(index)}
                 />
             ))}
         </DragContainer>

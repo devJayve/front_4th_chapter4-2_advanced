@@ -1,8 +1,8 @@
-import {PropsWithChildren, useCallback, useMemo} from "react";
+import {memo, PropsWithChildren, useCallback, useMemo} from "react";
 import {useDndContext} from "@dnd-kit/core";
 import {Box} from "@chakra-ui/react";
 
-export default function DragContainer({tableId, children}: PropsWithChildren & {tableId: string}) {
+const DragContainer = memo(({tableId, children}: PropsWithChildren & {tableId: string})  => {
     const dndContext = useDndContext();
 
     const getActiveTableId = useCallback(() => {
@@ -23,4 +23,6 @@ export default function DragContainer({tableId, children}: PropsWithChildren & {
             {children}
         </Box>
     );
-}
+});
+
+export default DragContainer;
