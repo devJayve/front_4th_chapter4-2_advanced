@@ -11,7 +11,7 @@ export interface SearchInfo {
 }
 
 export const ScheduleTables = () => {
-    const {schedulesMap, removeScheduleTable} = useScheduleListContext();
+    const { schedulesMap } = useScheduleListContext();
 
     const disabledRemoveButton = useMemo(() => Object.keys(schedulesMap).length === 1, [schedulesMap]);
 
@@ -22,7 +22,6 @@ export const ScheduleTables = () => {
                     key={`schedule-table-${index}`}
                     tableId={tableId}
                     index={index}
-                    removeScheduleTable={removeScheduleTable}
                     disabledRemoveButton={disabledRemoveButton}
                 />
             ))}

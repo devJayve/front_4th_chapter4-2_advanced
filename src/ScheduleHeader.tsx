@@ -1,15 +1,20 @@
 import {Button, ButtonGroup, Flex, Heading} from "@chakra-ui/react";
 import {useScheduleContext} from "./provider/ScheduleProvider.tsx";
+import {useScheduleListContext} from "./provider/ScheduleListProvider.tsx";
 
 interface ScheduleHeaderProps {
     index: number;
-    onRemoveScheduleTable: () => void;
     disabledRemoveButton: boolean;
     showSearchDialog: () => void;
 }
 
-const ScheduleHeader = ({index, onRemoveScheduleTable, disabledRemoveButton, showSearchDialog}: ScheduleHeaderProps) => {
-    const {  duplicateSchedule } = useScheduleContext();
+const ScheduleHeader = ({index, disabledRemoveButton, showSearchDialog}: ScheduleHeaderProps) => {
+    const {  duplicateSchedule, tableId } = useScheduleContext();
+    const { removeScheduleTable } = useScheduleListContext();
+
+    const handleRemoveScheduleTable = () => {
+        removeScheduleTable(tableId);
+    }
 
     return (
         <Flex justifyContent="space-between" alignItems="center">
@@ -19,7 +24,7 @@ const ScheduleHeader = ({index, onRemoveScheduleTable, disabledRemoveButton, sho
                 <Button colorScheme="green" mx="1px"
                         onClick={duplicateSchedule}>복제</Button>
                 <Button colorScheme="green" isDisabled={disabledRemoveButton}
-                        onClick={onRemoveScheduleTable}>삭제</Button>
+                        onClick={handleRemoveScheduleTable}>삭제</Button>
             </ButtonGroup>
         </Flex>
     );

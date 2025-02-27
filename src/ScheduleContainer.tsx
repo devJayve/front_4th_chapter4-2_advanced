@@ -10,14 +10,12 @@ import ScheduleHeader from "./ScheduleHeader.tsx";
 interface ScheduleContainerProps {
     index: number;
     tableId: string;
-    removeScheduleTable: (tableId: string) => void;
     disabledRemoveButton: boolean;
 }
 
 const ScheduleContainer = memo(({
                                     index,
                                     tableId,
-                                    removeScheduleTable,
                                     disabledRemoveButton
                                 }: ScheduleContainerProps) => {
     const [searchInfo, setSearchInfo] = useState<SearchInfo | null>(null);
@@ -30,16 +28,15 @@ const ScheduleContainer = memo(({
         setSearchInfo({tableId});
     }, [tableId]);
 
-    const handleRemoveScheduleTable = useCallback(() => {
-        removeScheduleTable(tableId);
-    }, [removeScheduleTable, tableId]);
-
 
     return (
         <ScheduleProvider tableId={tableId}>
             <Stack key={tableId} width="600px">
-                <ScheduleHeader index={index} onRemoveScheduleTable={handleRemoveScheduleTable}
-                                disabledRemoveButton={disabledRemoveButton} showSearchDialog={handleShowSearchDialog}/>
+                <ScheduleHeader
+                    index={index}
+                    disabledRemoveButton={disabledRemoveButton}
+                    showSearchDialog={handleShowSearchDialog}
+                />
                 <DndProvider>
                     <ScheduleTable onScheduleTimeClick={handleScheduleTimeClick}/>
                 </DndProvider>

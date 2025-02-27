@@ -1,4 +1,4 @@
-import {createContext, PropsWithChildren, useCallback, useContext, useState} from "react";
+import {createContext, PropsWithChildren, useCallback, useContext, useEffect, useState} from "react";
 import {useScheduleListContext} from "./ScheduleListProvider.tsx";
 import {Schedule} from "../types.ts";
 
@@ -17,19 +17,23 @@ export default function ScheduleProvider({tableId, children}: PropsWithChildren<
     const {updateScheduleTable, schedulesMap} = useScheduleListContext();
     const [schedules, setSchedules] = useState(() => schedulesMap[tableId] || []);
 
+    useEffect(() => {
+        setSchedules(schedulesMap[tableId] || []);
+    }, [schedulesMap, tableId]);
+
     const updateSchedule = useCallback((index: number, schedule: Schedule) => {
         const newSchedules = [...schedules];
         newSchedules[index] = schedule;
         setSchedules(newSchedules);
-    }, [schedules, tableId, updateScheduleTable]);
+    }, [schedules]);
 
     const removeSchedule = useCallback((index: number) => {
         setSchedules(schedules.filter((_, i) => i !== index));
-    }, [schedules, tableId, updateScheduleTable]);
+    }, [schedules]);
 
     const addSchedules = useCallback((newSchedules: Schedule[]) => {
         setSchedules([...schedules, ...newSchedules]);
-    }, [schedules, tableId, updateScheduleTable]);
+    }, [schedules]);
 
     const duplicateSchedule = useCallback(() => {
         const newTableId = `schedule-${Date.now()}`;

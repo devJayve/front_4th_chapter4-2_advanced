@@ -32,7 +32,9 @@ export const ScheduleListProvider = ({children}: PropsWithChildren) => {
 
     // 스케줄 테이블 삭제
     const removeScheduleTable = useCallback((tableId: string) => {
+        console.log(tableId);
         setSchedulesMap(prev => {
+            console.log(prev);
             delete prev[tableId];
             return {...prev};
         })
@@ -53,7 +55,6 @@ export const ScheduleListProvider = ({children}: PropsWithChildren) => {
             duplicateScheduleTable,
             removeScheduleTable,
             updateScheduleTable,
-            // getSchedules,
         }}>
             {children}
         </ScheduleListContext.Provider>
